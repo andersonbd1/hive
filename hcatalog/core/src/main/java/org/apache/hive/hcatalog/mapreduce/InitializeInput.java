@@ -88,6 +88,18 @@ class InitializeInput {
       HCatUtil.serialize(getInputJobInfo(conf, inputJobInfo, null)));
   }
 
+
+  /**
+   * Returns the given InputJobInfo for MultiInput after populating with data queried from the
+   * metadata
+   * service.
+   */
+  public static InputJobInfo getInputJobInfoForMultiInputs(Configuration conf,
+                                                           InputJobInfo inputJobInfo,
+                                                           String locationFilter) throws Exception {
+      return getInputJobInfo(conf, inputJobInfo, locationFilter);
+  }
+
   /**
    * Returns the given InputJobInfo after populating with data queried from the metadata service.
    */

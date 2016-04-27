@@ -21,10 +21,7 @@ package org.apache.hive.hcatalog.mapreduce;
 import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.hive.metastore.MetaStoreUtils;
-import org.apache.hive.hcatalog.common.HCatUtil;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -166,15 +163,11 @@ public class InputJobInfo implements Serializable {
   private void writeObject(ObjectOutputStream oos)
     throws IOException {
     oos.defaultWriteObject();
-
     Deflater def = new Deflater(Deflater.BEST_COMPRESSION);
-    ByteArrayOutputStream bout = new ByteArrayOutputStream();
     ObjectOutputStream partInfoWriter =
-            new ObjectOutputStream(new DeflaterOutputStream(bout, def));
+      new ObjectOutputStream(new DeflaterOutputStream(oos, def));
     partInfoWriter.writeObject(partitions);
     partInfoWriter.close();
-    String partInfoEncodeStr = HCatUtil.encodeBytes(bout.toByteArray());
-    oos.writeObject(partInfoEncodeStr);
   }
 
   /**
@@ -186,10 +179,8 @@ public class InputJobInfo implements Serializable {
   private void readObject(ObjectInputStream ois)
     throws IOException, ClassNotFoundException {
     ois.defaultReadObject();
-    String partInfoEncodeStr = (String)ois.readObject();
-    ByteArrayInputStream bin = new ByteArrayInputStream(HCatUtil.decodeBytes(partInfoEncodeStr));
     ObjectInputStream partInfoReader =
-      new ObjectInputStream(new InflaterInputStream(bin));
+      new ObjectInputStream(new InflaterInputStream(ois));
     partitions = (List<PartInfo>)partInfoReader.readObject();
   }
 }
